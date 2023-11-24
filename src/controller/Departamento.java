@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import model.Horario;
 
 public class Departamento {
     private List<Evento> eventos;
@@ -13,6 +14,14 @@ public class Departamento {
     public Departamento() {
         eventos = new ArrayList<>();
         espacosFisicos = new Hashtable<>();
+    }
+
+    public List<Evento> getEventos() {
+        return eventos;
+    }
+
+    public Hashtable<String, EspacoFisico> getEspacosFisicos() {
+        return espacosFisicos;
     }
 
     public ArrayList<Evento> lerAquivo(){
@@ -61,15 +70,17 @@ public class Departamento {
     private boolean disponibilidadeHorario(EspacoFisico espacoFisico, Evento evento) {
         if (!espacoFisico.getEventosAtuais().isEmpty()) {
             for (Evento x : espacoFisico.getEventosAtuais()) {
-                if (x.getHorario().getHorario().equals(evento.getHorario().getHorario())) {
-                    return false;
+                StringBuilder horario1 = x.getHorario().verificarHorario();
+                StringBuilder horario2 = evento.getHorario().verificarHorario();
+                if (Horario.compararHorarios(horario1, horario2)) {
+                    return true;
                 }
             }
+            return false;
         }
         return true;
     }
     public EspacoFisico buscarEspaco(Evento evento, String horario){
-        //Tenho que fazer a verificacao do HORARIO TBM!!!! hashtable<Horario (evento.getHorario), Evento>
         if (!(espacosFisicos.isEmpty())){
             int menorDiferenca = Integer.MAX_VALUE;
             EspacoFisico espacoFisicoEscolhido = null;
@@ -107,18 +118,18 @@ public class Departamento {
     public void alocarEventos(){
         List<Evento> eventosParaRemover = new ArrayList<>();
         if (!(eventos.isEmpty())){
-            for(Evento x : eventos){ //SUBSTITUIR POR eventos.get(0) e dps remover.
-                EspacoFisico espaco = buscarEspaco(x, x.getHorario().getHorario());
-                if (espaco != null){
-                    espaco.addEventosAtuais(x);
-                    eventosParaRemover.add(x);
-                    System.out.println(x + " Alocado em: " + espaco);
-                }
-                else{
-                    System.out.println("Parece que não há espaco para colocar esse evento");
-                    return;
-                }
+
+            EspacoFisico espaco = buscarEspaco(eventos.get(0), eventos.get(0).getHorario().getHorario());
+            if (espaco != null){
+                espaco.addEventosAtuais(eventos.get(0));
+                eventosParaRemover.add(eventos.get(0));
+                System.out.println(eventos.get(0) + " Alocado em: " + espaco);
             }
+            else{
+                System.out.println("Parece que não há espaco para colocar o " + eventos.get(0));
+                return;
+            }
+
         }
         eventos.removeAll(eventosParaRemover);
         eventosParaRemover.clear();

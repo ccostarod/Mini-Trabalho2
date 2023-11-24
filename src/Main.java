@@ -26,7 +26,10 @@ public class Main {
         EspacoFisico sala = new SalaDeAula("Sala 203",26);
         departamento.inserirEspaco(auditorio.getNome(),auditorio);
         departamento.inserirEspaco(sala.getNome(), sala);
+        //AGORA ESTA ALOCANDO UM POR UM. A PESSOA PODE PARAR QUANDO QUISER POIS OS OUTROS EVENTOS ESTAO NUMA LISTA
         departamento.alocarEventos();
-
+        departamento.alocarEventos();
+        departamento.alocarEventos();
+        departamento.alocarEventos();
     }
 }

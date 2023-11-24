@@ -35,6 +35,7 @@ public abstract class Evento {
         return horario;
     }
 
+
     @Override
     public String toString() {
         return "Evento: " +
@@ -44,4 +45,5 @@ public abstract class Evento {
                 ", vagas:" + vagas +
                 ", horario: " + horario.getHorario();
     }
+
 }

@@ -29,7 +29,6 @@ public class Departamento {
                 String[] separado = linha.split(";");
                 if (separado.length > 1){
                     solicitacao = new Solicitacao(separado[0]);
-
                     ano = Integer.parseInt(separado[1]);
                     semestre = separado[2];
                     curso = separado[3];
@@ -40,7 +39,6 @@ public class Departamento {
                         finalidade = separado[4];
                     }
                     vagas = Integer.parseInt(separado[5]);
-
                     horario = new Horario();
                     horario.setHorario(separado[6]);
                     Evento evento;
@@ -51,9 +49,7 @@ public class Departamento {
                         evento = new EventoEsporadico(ano, semestre, curso, finalidade, vagas, horario);
                     }
                     eventos.add(evento);
-
                 }
-
             }
             leitor.close();
         } catch (IOException e) {
@@ -62,28 +58,39 @@ public class Departamento {
 
         return (ArrayList<Evento>) eventos;
     }
-    public EspacoFisico buscarEspaco(Evento evento){
+    private boolean disponibilidadeHorario(EspacoFisico espacoFisico, Evento evento) {
+        if (!espacoFisico.getEventosAtuais().isEmpty()) {
+            for (Evento x : espacoFisico.getEventosAtuais()) {
+                if (x.getHorario().getHorario().equals(evento.getHorario().getHorario())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public EspacoFisico buscarEspaco(Evento evento, String horario){
         //Tenho que fazer a verificacao do HORARIO TBM!!!! hashtable<Horario (evento.getHorario), Evento>
         if (!(espacosFisicos.isEmpty())){
             int menorDiferenca = Integer.MAX_VALUE;
             EspacoFisico espacoFisicoEscolhido = null;
             int capacidade = evento.getVagas();
             for (String x : espacosFisicos.keySet()){
-                if (evento instanceof EventoEsporadico){
-                    if(espacosFisicos.get(x) instanceof Auditorio){
-                        EspacoFisico espacoFisicoAtual = espacosFisicos.get(x);
-                        if (espacoFisicoAtual.isDisponibilidade()) {
-                            int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
-                            if (diferenca < menorDiferenca && diferenca > 0){
-                                menorDiferenca = diferenca;
-                                espacoFisicoEscolhido = espacoFisicoAtual;
-                            }
+                EspacoFisico espacoFisicoAtual = espacosFisicos.get(x);
+                if (evento instanceof EventoEsporadico && espacosFisicos.get(x) instanceof Auditorio){
+                    if (disponibilidadeHorario(espacoFisicoAtual, evento))
+                    {
+                        int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
+                        if (diferenca < menorDiferenca && diferenca > 0) {
+                            menorDiferenca = diferenca;
+                            espacoFisicoEscolhido = espacoFisicoAtual;
                         }
                     }
                 }
+
+
                 else if (evento instanceof EventoFixo){
-                    EspacoFisico espacoFisicoAtual = espacosFisicos.get(x);
-                    if (espacoFisicoAtual.isDisponibilidade()){
+                    if (disponibilidadeHorario(espacoFisicoAtual, evento))
+                    {
                         int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
                         if (diferenca < menorDiferenca && diferenca > 0){
                             menorDiferenca = diferenca;
@@ -91,14 +98,9 @@ public class Departamento {
                         }
                     }
                 }
-                else {
-                    return null;
-                }
+
             }
-            if (espacoFisicoEscolhido != null){
-                espacoFisicoEscolhido.setDisponibilidade(false);
-                return espacoFisicoEscolhido;
-            }
+            return espacoFisicoEscolhido;
         }
         return null;
     }
@@ -106,12 +108,14 @@ public class Departamento {
         List<Evento> eventosParaRemover = new ArrayList<>();
         if (!(eventos.isEmpty())){
             for(Evento x : eventos){ //SUBSTITUIR POR eventos.get(0) e dps remover.
-                EspacoFisico espaco = buscarEspaco(x);
+                EspacoFisico espaco = buscarEspaco(x, x.getHorario().getHorario());
                 if (espaco != null){
-                    espaco.setEventoAtual(x);
+                    espaco.addEventosAtuais(x);
                     eventosParaRemover.add(x);
+                    System.out.println(x + " Alocado em: " + espaco);
                 }
                 else{
+                    System.out.println("Parece que não há espaco para colocar esse evento");
                     return;
                 }
             }

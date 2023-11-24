@@ -1,17 +1,19 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 public abstract class EspacoFisico {
     protected int capacidade;
     protected String nome;
-    protected Evento eventoAtual;
-    protected boolean disponibilidade;
+    protected List<Evento> eventosAtuais;
+
 
     public EspacoFisico(String nome,int capacidade) {
         this.nome = nome;
         this.capacidade = capacidade;
-        this.disponibilidade = true;
+        eventosAtuais = new ArrayList<>();
     }
 
     public String getNome() {
@@ -30,20 +32,16 @@ public abstract class EspacoFisico {
         this.capacidade = capacidade;
     }
 
-    public Evento getEventoAtual() {
-        return eventoAtual;
+    public List<Evento> getEventosAtuais() {
+        return eventosAtuais;
     }
 
-    public void setEventoAtual(Evento eventoAtual) {
-        this.eventoAtual = eventoAtual;
+    public void setEventosAtuais(List<Evento> eventosAtuais) {
+        this.eventosAtuais = eventosAtuais;
     }
 
-    public boolean isDisponibilidade() {
-        return disponibilidade;
-    }
-
-    public void setDisponibilidade(boolean disponibilidade) {
-        this.disponibilidade = disponibilidade;
+    public void addEventosAtuais(Evento evento){
+        this.eventosAtuais.add(evento);
     }
 
     @Override
@@ -51,7 +49,7 @@ public abstract class EspacoFisico {
         return "EspacoFisico{" +
                 "capacidade=" + capacidade +
                 ", nome='" + nome + '\'' +
-                ", eventoAtual=" + eventoAtual +
+                ", eventoAtuais" + eventosAtuais +
                 '}';
     }
 }

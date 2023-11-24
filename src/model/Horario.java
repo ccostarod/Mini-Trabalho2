@@ -1,12 +1,14 @@
 package model;
 
 public class Horario {
-    private String Horario;
+    private String horario;
     public void setHorario(String horario) {
-        Horario = horario;
+        this.horario = horario;
     }
 
     public String getHorario() {
-        return Horario;
+        return horario;
     }
+
+
 }

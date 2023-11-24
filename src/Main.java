@@ -21,6 +21,7 @@ public class Main {
         else{
             System.out.println("Paece que nao ha nada no arquivo");
         }
+        System.out.println();
         EspacoFisico auditorio = new Auditorio("Auditorio CCET", 34);
         EspacoFisico sala = new SalaDeAula("Sala 203",26);
         departamento.inserirEspaco(auditorio.getNome(),auditorio);

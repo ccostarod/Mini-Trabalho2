@@ -23,7 +23,9 @@ public class Departamento {
     public Hashtable<String, EspacoFisico> getEspacosFisicos() {
         return espacosFisicos;
     }
-
+    public void inserirEspaco(String nomeEspaco,EspacoFisico espacoFisico){
+        espacosFisicos.put(nomeEspaco, espacoFisico);
+    }
     public ArrayList<Evento> lerAquivo(){
         try{
             int ano, vagas;
@@ -67,20 +69,17 @@ public class Departamento {
 
         return (ArrayList<Evento>) eventos;
     }
-    private boolean disponibilidadeHorario(EspacoFisico espacoFisico, Evento evento) {
+    private boolean haDisponibilidadeHorario(EspacoFisico espacoFisico, Evento evento) {
         if (!espacoFisico.getEventosAtuais().isEmpty()) {
             for (Evento x : espacoFisico.getEventosAtuais()) {
-                StringBuilder horario1 = x.getHorario().verificarHorario();
-                StringBuilder horario2 = evento.getHorario().verificarHorario();
-                if (Horario.compararHorarios(horario1, horario2)) {
-                    return true;
+                if (Horario.haColisao(x.getHorario().getHorario(), evento.getHorario().getHorario())) {
+                    return false;
                 }
             }
-            return false;
         }
         return true;
     }
-    public EspacoFisico buscarEspaco(Evento evento, String horario){
+    public EspacoFisico buscarEspaco(Evento evento){
         if (!(espacosFisicos.isEmpty())){
             int menorDiferenca = Integer.MAX_VALUE;
             EspacoFisico espacoFisicoEscolhido = null;
@@ -88,7 +87,7 @@ public class Departamento {
             for (String x : espacosFisicos.keySet()){
                 EspacoFisico espacoFisicoAtual = espacosFisicos.get(x);
                 if (evento instanceof EventoEsporadico && espacosFisicos.get(x) instanceof Auditorio){
-                    if (disponibilidadeHorario(espacoFisicoAtual, evento))
+                    if (haDisponibilidadeHorario(espacoFisicoAtual, evento))
                     {
                         int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
                         if (diferenca < menorDiferenca && diferenca > 0) {
@@ -97,10 +96,8 @@ public class Departamento {
                         }
                     }
                 }
-
-
                 else if (evento instanceof EventoFixo){
-                    if (disponibilidadeHorario(espacoFisicoAtual, evento))
+                    if (haDisponibilidadeHorario(espacoFisicoAtual, evento))
                     {
                         int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
                         if (diferenca < menorDiferenca && diferenca > 0){
@@ -119,7 +116,7 @@ public class Departamento {
         List<Evento> eventosParaRemover = new ArrayList<>();
         if (!(eventos.isEmpty())){
 
-            EspacoFisico espaco = buscarEspaco(eventos.get(0), eventos.get(0).getHorario().getHorario());
+            EspacoFisico espaco = buscarEspaco(eventos.get(0));
             if (espaco != null){
                 espaco.addEventosAtuais(eventos.get(0));
                 eventosParaRemover.add(eventos.get(0));
@@ -134,7 +131,8 @@ public class Departamento {
         eventos.removeAll(eventosParaRemover);
         eventosParaRemover.clear();
     }
-    public void inserirEspaco(String nomeEspaco,EspacoFisico espacoFisico){
-        espacosFisicos.put(nomeEspaco, espacoFisico);
-    }
+
+
+
+
 }

@@ -31,5 +31,19 @@ public class Main {
         departamento.alocarEventos();
         departamento.alocarEventos();
         departamento.alocarEventos();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        for (Evento x : departamento.gerarRelatorioAlocacoesCurso("CC")){
+            System.out.println(x);
+        }
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        for(Evento x : departamento.gerarRelatorioAlocacoesPorEspaco("Sala 203")){
+            System.out.println(x);
+        }
     }
 }

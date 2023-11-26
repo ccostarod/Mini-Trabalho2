@@ -88,9 +88,7 @@ public class Horario {
         if (horario1 != null && horario2 != null) {
             String[] horario1Split = horario1.split("");
             String[] horario2Split = horario2.split("");
-            if (colideDias(horario1Split, horario2Split) && colideTurno(horario1Split, horario2Split) && colideHorario(horario1Split, horario2Split)){
-                return true;
-            }
+            return colideDias(horario1Split, horario2Split) && colideTurno(horario1Split, horario2Split) && colideHorario(horario1Split, horario2Split);
         }
         return false;
     }

@@ -24,7 +24,12 @@ public class Departamento {
         return espacosFisicos;
     }
     public void inserirEspaco(String nomeEspaco,EspacoFisico espacoFisico){
-        espacosFisicos.put(nomeEspaco, espacoFisico);
+        if (!espacosFisicos.containsKey(nomeEspaco)){
+            espacosFisicos.put(nomeEspaco, espacoFisico);
+        }
+        else{
+            System.out.println("Já existe um local com esse nome no sistema");
+        }
     }
     public ArrayList<Evento> lerAquivo(){
         try{
@@ -69,15 +74,20 @@ public class Departamento {
 
         return (ArrayList<Evento>) eventos;
     }
-    private boolean haDisponibilidadeHorario(EspacoFisico espacoFisico, Evento evento) {
+    private EspacoFisico haDisponibilidadeHorario(EspacoFisico espacoFisico, Evento evento) {
         if (!espacoFisico.getEventosAtuais().isEmpty()) {
+            EspacoFisico espacoFisico1 = null;
             for (Evento x : espacoFisico.getEventosAtuais()) {
-                if (Horario.haColisao(x.getHorario().getHorario(), evento.getHorario().getHorario())) {
-                    return false;
+                if (!evento.getSemestre().equals(x.getSemestre())){
+                    return espacoFisico;
+                }
+                if (!Horario.haColisao(x.getHorario().getHorario(), evento.getHorario().getHorario())) {
+                    espacoFisico1 = espacoFisico;
                 }
             }
+            return espacoFisico1;
         }
-        return true;
+        return espacoFisico;
     }
     public EspacoFisico buscarEspaco(Evento evento){
         if (!(espacosFisicos.isEmpty())){
@@ -86,9 +96,9 @@ public class Departamento {
             int capacidade = evento.getVagas();
             for (String x : espacosFisicos.keySet()){
                 EspacoFisico espacoFisicoAtual = espacosFisicos.get(x);
-                if (evento instanceof EventoEsporadico && espacosFisicos.get(x) instanceof Auditorio){
-                    if (haDisponibilidadeHorario(espacoFisicoAtual, evento))
-                    {
+                if (evento instanceof EventoEsporadico && espacoFisicoAtual instanceof Auditorio){
+                    espacoFisicoAtual = haDisponibilidadeHorario(espacoFisicoAtual, evento);
+                    if (espacoFisicoAtual != null){
                         int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
                         if (diferenca < menorDiferenca && diferenca > 0) {
                             menorDiferenca = diferenca;
@@ -97,7 +107,8 @@ public class Departamento {
                     }
                 }
                 else if (evento instanceof EventoFixo){
-                    if (haDisponibilidadeHorario(espacoFisicoAtual, evento))
+                    espacoFisicoAtual = haDisponibilidadeHorario(espacoFisicoAtual, evento);
+                    if (espacoFisicoAtual != null)
                     {
                         int diferenca = espacoFisicoAtual.getCapacidade() - capacidade;
                         if (diferenca < menorDiferenca && diferenca > 0){
@@ -106,7 +117,6 @@ public class Departamento {
                         }
                     }
                 }
-
             }
             return espacoFisicoEscolhido;
         }
@@ -124,15 +134,30 @@ public class Departamento {
             }
             else{
                 System.out.println("Parece que não há espaco para colocar o " + eventos.get(0));
-                return;
+                eventosParaRemover.add(eventos.get(0));
             }
-
         }
         eventos.removeAll(eventosParaRemover);
         eventosParaRemover.clear();
     }
 
+    public List<Evento> gerarRelatorioAlocacoesCurso(String curso){
+        List<Evento> relatorio = new ArrayList<>();
+        for (String x : espacosFisicos.keySet()){
+            EspacoFisico espacoFisicoAtual = espacosFisicos.get(x);
+            if (espacoFisicoAtual.consultarEventosAtuaisPorCurso(curso) != null){
+                relatorio.addAll(espacoFisicoAtual.consultarEventosAtuaisPorCurso(curso));
+            }
+        }
+        return relatorio;
+    }
 
-
-
+    public List<Evento> gerarRelatorioAlocacoesPorEspaco(String espaco){
+        for (String x : espacosFisicos.keySet()){
+            if (x.equals(espaco)){
+                return espacosFisicos.get(x).getEventosAtuais();
+            }
+        }
+        return null;
+    }
 }

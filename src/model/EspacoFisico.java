@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class EspacoFisico {
     protected int capacidade;
@@ -42,6 +43,16 @@ public abstract class EspacoFisico {
 
     public void addEventosAtuais(Evento evento){
         this.eventosAtuais.add(evento);
+    }
+
+
+    public List<Evento> consultarEventosAtuaisPorCurso(String curso){
+        List<Evento> consulta = new ArrayList<>();
+        consulta = eventosAtuais.stream().filter(x-> x.getCurso().equals(curso)).collect(Collectors.toList());
+        if (!consulta.isEmpty()){
+            return consulta;
+        }
+        return null;
     }
 
     @Override
